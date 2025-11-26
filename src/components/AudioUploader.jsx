@@ -51,7 +51,7 @@ const containerVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-const AudioUploader = ({ onData }) => {
+const AudioUploader = ({ onData, analysisMode = "complete" }) => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -104,12 +104,13 @@ const AudioUploader = ({ onData }) => {
 
     setError(null);
     setLoading(true);
-    log.info("upload_start", { mime: file.type, size: file.size });
+    log.info("upload_start", { mime: file.type, size: file.size, mode: analysisMode });
 
     try {
-      const extracted = await procesarAudio(file);
+      const useSimple = analysisMode === "simple";
+      const extracted = await procesarAudio(file, useSimple);
       onData(extracted);
-      log.info("upload_success");
+      log.info("upload_success", { mode: analysisMode });
     } catch (err) {
       setError(err.message ?? "Error al procesar el audio");
       log.warn("upload_failed", { message: err?.message || "unknown" });

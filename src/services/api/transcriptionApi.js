@@ -16,20 +16,23 @@ const client = createHttpClient({
   timeoutMs: 200000,
 });
 
-export async function procesarAudio(audioFile) {
+export async function procesarAudio(audioFile, useSimpleAnalysis = false) {
   const info = audioFile ? { mime: audioFile.type, size: audioFile.size } : {};
+  const endpoint = useSimpleAnalysis ? "transcribe-simple" : "transcribe";
+  
   try {
-    log.info("transcribe_start", info);
+    log.info("transcribe_start", { ...info, mode: useSimpleAnalysis ? "simple" : "complete" });
     const form = new FormData();
     form.append("file", audioFile);
-    const res = await client.post("transcribe", form);
+    const res = await client.post(endpoint, form);
     const payload = res?.extracted_data ?? res;
-    log.info("transcribe_success");
+    log.info("transcribe_success", { mode: useSimpleAnalysis ? "simple" : "complete" });
     return payload;
   } catch (e) {
     log.warn("transcribe_failed", {
       message: e?.message || "unknown",
       status: e?.status,
+      mode: useSimpleAnalysis ? "simple" : "complete",
     });
     throw e;
   }
@@ -43,22 +46,25 @@ export function useTranscriptionApi() {
   const api = useApi();
 
   const procesarAudioHook = useCallback(
-    async (audioFile) => {
+    async (audioFile, useSimpleAnalysis = false) => {
       const info = audioFile
         ? { mime: audioFile.type, size: audioFile.size }
         : {};
+      const endpoint = useSimpleAnalysis ? "transcribe-simple" : "transcribe";
+      
       try {
-        log.info("transcribe_start", info);
+        log.info("transcribe_start", { ...info, mode: useSimpleAnalysis ? "simple" : "complete" });
         const form = new FormData();
         form.append("file", audioFile);
-        const res = await api.post("transcribe", form);
+        const res = await api.post(endpoint, form);
         const payload = res?.extracted_data ?? res;
-        log.info("transcribe_success");
+        log.info("transcribe_success", { mode: useSimpleAnalysis ? "simple" : "complete" });
         return payload;
       } catch (e) {
         log.warn("transcribe_failed", {
           message: e?.message || "unknown",
           status: e?.status,
+          mode: useSimpleAnalysis ? "simple" : "complete",
         });
         throw e;
       }

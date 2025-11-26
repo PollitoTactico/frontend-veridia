@@ -179,7 +179,7 @@ function CustomAudioPlayer({ src }) {
   );
 }
 
-const AudioRecorder = ({ onData }) => {
+const AudioRecorder = ({ onData, analysisMode = "complete" }) => {
   const [recording, setRecording] = useState(false);
   const [audioURL, setAudioURL] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -295,11 +295,12 @@ const AudioRecorder = ({ onData }) => {
       else if (mime.includes("mp3")) extension = "mp3";
 
       const file = new File([blob], `grabacion.${extension}`, { type: mime });
-      log.info("send_start", { mime, size: blob.size });
+      log.info("send_start", { mime, size: blob.size, mode: analysisMode });
 
-      const data = await procesarAudio(file);
+      const useSimple = analysisMode === "simple";
+      const data = await procesarAudio(file, useSimple);
       onData?.(data);
-      log.info("send_success");
+      log.info("send_success", { mode: analysisMode });
     } catch (err) {
       let errorMsg = "Error al enviar el audio.";
       if (err?.response?.data?.error) errorMsg = err.response.data.error;
