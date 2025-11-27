@@ -25,6 +25,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ArticleIcon from '@mui/icons-material/Article';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import { getLogger } from '../services/logs';
+import { recalcularIMC } from '../services/api/transcriptionApi';
 
 const log = getLogger('preview.historia.simple');
 
@@ -121,11 +122,27 @@ const HistoriaClinicaPreviewSimple = ({ data, onSave, onEditedDataChange }) => {
     setEditedData(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleNestedChange = (parentKey, childKey, value) => {
-    setEditedData(prev => ({
-      ...prev,
-      [parentKey]: { ...prev[parentKey], [childKey]: value }
-    }));
+  const handleNestedChange = async (parentKey, childKey, value) => {
+    const newData = {
+      ...editedData,
+      [parentKey]: { ...editedData[parentKey], [childKey]: value }
+    };
+    
+    // Si se edita peso o altura en examen_físico, recalcular IMC automáticamente
+    if (parentKey === 'examen_físico' && (childKey === 'peso_kg' || childKey === 'altura_cm')) {
+      try {
+        log.info('recalculating_imc', { peso: newData.examen_físico?.peso_kg, altura: newData.examen_físico?.altura_cm });
+        const updatedData = await recalcularIMC(newData);
+        setEditedData(updatedData);
+        log.info('imc_recalculated', { valor: updatedData.IMC?.valor, clasificacion: updatedData.IMC?.clasificacion });
+      } catch (error) {
+        log.warn('imc_recalculation_failed', { error: error.message });
+        // Si falla, al menos actualizar los datos básicos sin IMC
+        setEditedData(newData);
+      }
+    } else {
+      setEditedData(newData);
+    }
   };
 
   const handleArrayChange = (parentKey, index, childKey, value) => {

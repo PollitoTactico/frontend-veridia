@@ -42,6 +42,21 @@ export function getMe() {
   return client.get("me");
 }
 
+export async function recalcularIMC(data) {
+  try {
+    log.info("recalculate_imc_start");
+    const res = await client.post("recalculate-imc", { data });
+    log.info("recalculate_imc_success");
+    return res?.data ?? res;
+  } catch (e) {
+    log.warn("recalculate_imc_failed", {
+      message: e?.message || "unknown",
+      status: e?.status,
+    });
+    throw e;
+  }
+}
+
 export function useTranscriptionApi() {
   const api = useApi();
 

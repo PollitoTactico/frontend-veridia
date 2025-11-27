@@ -27,6 +27,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ArticleIcon from '@mui/icons-material/Article';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { getLogger } from '../services/logs';
+import { recalcularIMC } from '../services/api/transcriptionApi';
 
 const log = getLogger('preview.historia');
 
@@ -129,11 +130,26 @@ const HistoriaClinicaPreview = ({ data, onSave, onEditedDataChange }) => {
     setEditedData(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleNestedChange = (parentKey, childKey, value) => {
-    setEditedData(prev => ({
-      ...prev,
-      [parentKey]: { ...prev[parentKey], [childKey]: value }
-    }));
+  const handleNestedChange = async (parentKey, childKey, value) => {
+    const newData = {
+      ...editedData,
+      [parentKey]: { ...editedData[parentKey], [childKey]: value }
+    };
+    
+    // Recalcular IMC automáticamente si se edita peso o altura
+    if (parentKey === 'examen_físico' && (childKey === 'peso_kg' || childKey === 'altura_cm')) {
+      try {
+        log.info('recalculating_imc', { peso: newData.examen_físico?.peso_kg, altura: newData.examen_físico?.altura_cm });
+        const updatedData = await recalcularIMC(newData);
+        setEditedData(updatedData);
+        log.info('imc_recalculated', { valor: updatedData.IMC?.valor, clasificacion: updatedData.IMC?.clasificacion });
+      } catch (error) {
+        log.warn('imc_recalculation_failed', { error: error.message });
+        setEditedData(newData);
+      }
+    } else {
+      setEditedData(newData);
+    }
   };
 
   const handleArrayChange = (parentKey, index, childKey, value) => {
