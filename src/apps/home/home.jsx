@@ -26,8 +26,6 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import SecurityIcon from "@mui/icons-material/Security";
 import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
-import SettingsIcon from "@mui/icons-material/Settings";
-import ArticleIcon from "@mui/icons-material/Article";
 import AudioSection from "./sections/AudioSection";
 import CloseIcon from "@mui/icons-material/Close";
 import PreviewSection from "./sections/PreviewSection";
@@ -37,7 +35,6 @@ import { getLogger } from "../../services/logs";
 import { motion } from "framer-motion";
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import HistoriaClinicaPreviewSimple from "../../components/HistoriaClinicaPreviewSimple";
 
 const MotionPaper = motion.create(Paper);
 
@@ -315,7 +312,6 @@ function SectionCard({ icon: Icon, title, children, delay }) {
 export default function Home() {
   const [ficha, setFicha] = useState(null);
   const [editedData, setEditedData] = useState(null);
-  const [analysisMode, setAnalysisMode] = useState("complete"); // "complete" or "simple"
   const log = getLogger("home");
 
   const handleData = (data) => {
@@ -324,9 +320,9 @@ export default function Home() {
     try {
       const keys =
         data && typeof data === "object" ? Object.keys(data).length : 0;
-      log.info("ficha_received", { keys, mode: analysisMode });
+      log.info("ficha_received", { keys });
     } catch {
-      log.info("ficha_received", { mode: analysisMode });
+      log.info("ficha_received");
     }
   };
 
@@ -581,7 +577,7 @@ export default function Home() {
             <Box sx={{ mb: 12, position: "relative" }}>
               <Box sx={{ textAlign: "center", mb: 8 }}>
                 <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1, px: 2, py: 1, borderRadius: 2, background: "linear-gradient(135deg, rgba(0, 168, 150, 0.15) 0%, rgba(0, 102, 204, 0.1) 100%)", border: "1px solid rgba(0, 168, 150, 0.3)", mb: 2 }}>
-                  <SettingsIcon sx={{ fontSize: 16, color: "#00a896" }} />
+                  <ElectricBoltIcon sx={{ fontSize: 16, color: "#00a896" }} />
                   <Typography variant="caption" sx={{ fontWeight: 700, color: "#00a896" }}>
                     Proceso simplificado
                   </Typography>
@@ -739,121 +735,13 @@ export default function Home() {
 
           {/* Main Sections */}
           <Stack spacing={4}>
-            {/* Mode Selection */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <SectionCard
-                icon={SettingsIcon}
-                title="Modo de Análisis"
-                delay={0.1}
-              >
-                <Box sx={{ p: 2 }}>
-                  <Typography variant="body2" sx={{ mb: 3, color: "text.secondary" }}>
-                    Selecciona el tipo de análisis que deseas realizar:
-                  </Typography>
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      style={{ flex: 1 }}
-                    >
-                      <Button
-                        fullWidth
-                        variant={analysisMode === "complete" ? "contained" : "outlined"}
-                        onClick={() => {
-                          setAnalysisMode("complete");
-                          setFicha(null);
-                          setEditedData(null);
-                          log.info("mode_changed", { mode: "complete" });
-                        }}
-                        sx={{
-                          textTransform: "none",
-                          fontWeight: 600,
-                          borderRadius: 2,
-                          py: 1.5,
-                          background: analysisMode === "complete"
-                            ? "linear-gradient(135deg, #0066cc 0%, #0052a3 100%)"
-                            : "transparent",
-                          borderColor: "#0066cc",
-                          color: analysisMode === "complete" ? "white" : "#0066cc",
-                          "&:hover": {
-                            background: analysisMode === "complete"
-                              ? "linear-gradient(135deg, #0052a3 0%, #003d7a 100%)"
-                              : "rgba(0, 102, 204, 0.05)",
-                            borderColor: "#0066cc",
-                          },
-                        }}
-                      >
-                        <Stack alignItems="center" spacing={0.5}>
-                          <SmartToyIcon sx={{ fontSize: 24 }} />
-                          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                            Con Recomendaciones
-                          </Typography>
-                          <Typography variant="caption" sx={{ fontSize: "11px", opacity: 0.8 }}>
-                            Incluye diagnósticos y tratamiento
-                          </Typography>
-                        </Stack>
-                      </Button>
-                    </motion.div>
-
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      style={{ flex: 1 }}
-                    >
-                      <Button
-                        fullWidth
-                        variant={analysisMode === "simple" ? "contained" : "outlined"}
-                        onClick={() => {
-                          setAnalysisMode("simple");
-                          setFicha(null);
-                          setEditedData(null);
-                          log.info("mode_changed", { mode: "simple" });
-                        }}
-                        sx={{
-                          textTransform: "none",
-                          fontWeight: 600,
-                          borderRadius: 2,
-                          py: 1.5,
-                          background: analysisMode === "simple"
-                            ? "linear-gradient(135deg, #00a896 0%, #007d6a 100%)"
-                            : "transparent",
-                          borderColor: "#00a896",
-                          color: analysisMode === "simple" ? "white" : "#00a896",
-                          "&:hover": {
-                            background: analysisMode === "simple"
-                              ? "linear-gradient(135deg, #007d6a 0%, #005d52 100%)"
-                              : "rgba(0, 168, 150, 0.05)",
-                            borderColor: "#00a896",
-                          },
-                        }}
-                      >
-                        <Stack alignItems="center" spacing={0.5}>
-                          <ArticleIcon sx={{ fontSize: 24 }} />
-                          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                            Sin Recomendaciones
-                          </Typography>
-                          <Typography variant="caption" sx={{ fontSize: "11px", opacity: 0.8 }}>
-                            Solo hechos y datos
-                          </Typography>
-                        </Stack>
-                      </Button>
-                    </motion.div>
-                  </Stack>
-                </Box>
-              </SectionCard>
-            </motion.div>
-
             {/* Audio Section */}
             <SectionCard
               icon={GraphicEqIcon}
               title="Grabación de Audio"
-              delay={0.2}
+              delay={0.1}
             >
-              <AudioSection onData={handleData} analysisMode={analysisMode} />
+              <AudioSection onData={handleData} />
             </SectionCard>
 
             {/* Preview Section */}
@@ -861,20 +749,16 @@ export default function Home() {
               <SectionCard
                 icon={VisibilityIcon}
                 title="Vista Previa"
-                delay={0.3}
+                delay={0.2}
               >
-                {analysisMode === "complete" ? (
-                  <PreviewSection data={ficha} onEditedDataChange={handleEditedDataChange} />
-                ) : (
-                  <HistoriaClinicaPreviewSimple data={ficha} onEditedDataChange={handleEditedDataChange} />
-                )}
+                <PreviewSection data={ficha} onEditedDataChange={handleEditedDataChange} />
               </SectionCard>
             )}
 
             {/* PDF Section */}
             {ficha && (
-              <SectionCard icon={DescriptionIcon} title="Descargar PDF" delay={0.4}>
-                <PdfSection data={ficha} editedData={editedData || ficha} isSimpleMode={analysisMode === "simple"} />
+              <SectionCard icon={DescriptionIcon} title="Descargar PDF" delay={0.3}>
+                <PdfSection data={ficha} editedData={editedData || ficha} isSimpleMode={false} />
               </SectionCard>
             )}
           </Stack>

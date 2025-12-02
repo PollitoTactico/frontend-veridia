@@ -5,14 +5,14 @@ import { motion } from 'framer-motion';
 
 const MotionBox = motion.create(Box);
 
-const AudioSection = ({ onData, analysisMode = "complete" }) => (
+const AudioSection = ({ onData }) => (
   <Stack spacing={3}>
     <MotionBox
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1 }}
     >
-      <AudioRecorder onData={onData} analysisMode={analysisMode} />
+      <AudioRecorder onData={onData} />
     </MotionBox>
     
     <Divider sx={{ my: 1 }}>
@@ -24,7 +24,7 @@ const AudioSection = ({ onData, analysisMode = "complete" }) => (
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.2 }}
     >
-      <AudioUploader onData={onData} analysisMode={analysisMode} />
+      <AudioUploader onData={onData} />
     </MotionBox>
   </Stack>
 );
